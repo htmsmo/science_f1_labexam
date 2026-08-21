@@ -15,7 +15,7 @@
         html, body {
             height: 100%;
             background-color: #0f172a;
-            overflow: hidden; /* 電腦版鎖定滿版，不出現外層捲動條 */
+            overflow: hidden;
         }
 
         body {
@@ -24,7 +24,6 @@
             height: 100vh;
         }
 
-        /* 主平台頂部導航列 */
         .portal-header {
             height: 54px;
             flex-shrink: 0;
@@ -53,7 +52,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* 實驗選擇標籤頁 */
         .exp-selector-container {
             display: flex;
             align-items: center;
@@ -98,7 +96,6 @@
             border-radius: 10px;
         }
 
-        /* 模擬器載入區 */
         .stage-container {
             flex: 1;
             width: 100%;
@@ -113,7 +110,6 @@
             display: block;
         }
 
-        /* 僅在手機橫置或高度過矮 (<=600px) 時開啟上下捲動 */
         @media (max-height: 600px) {
             html, body {
                 height: auto;
@@ -124,7 +120,7 @@
                 height: auto;
             }
             .stage-container {
-                height: 540px; /* 給予模擬器滿意的最低操作高度 */
+                height: 540px;
                 flex: none;
             }
         }
@@ -142,7 +138,6 @@
 </head>
 <body>
 
-    <!-- 平台頂部導航列 -->
     <header class="portal-header">
         <div class="portal-brand">
             🔬 <span>虛擬科學實驗室</span>
@@ -164,12 +159,10 @@
         </div>
     </header>
 
-    <!-- 模擬器內容展示區 -->
     <div class="stage-container">
         <iframe id="lab-frame" title="實驗模擬器展示區"></iframe>
     </div>
 
-    <!-- 本生燈實驗原始碼存放區 -->
     <template id="bunsen-code">
 <!DOCTYPE html>
 <html lang="zh-Hant">
@@ -179,14 +172,14 @@
     <title>虛擬科學實驗室 - 本生燈加熱水實驗</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --bg-color: #f4f7f6;
+            --primary-color: #1e293b;
+            --accent-color: #0284c7;
+            --bg-color: #f1f5f9;
             --panel-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --success-color: #2ecc71;
-            --warning-color: #e67e22;
-            --danger-color: #e74c3c;
+            --border-color: #cbd5e1;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; user-select: none; -webkit-user-select: none; }
         
@@ -217,10 +210,10 @@
 
         header h1 { font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
         .header-controls { display: flex; align-items: center; gap: 8px; }
-        .mode-switch { display: flex; background: #1a252f; padding: 2px; border-radius: 6px; }
-        .mode-btn { background: transparent; color: #bdc3c7; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .mode-switch { display: flex; background: #0f172a; padding: 2px; border-radius: 6px; }
+        .mode-btn { background: transparent; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; transition: all 0.2s; }
         .mode-btn.active { background: var(--accent-color); color: white; }
-        .btn-fullscreen { background: #4a69bd; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .btn-fullscreen { background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
         
         .container { 
             flex: 1; 
@@ -231,52 +224,81 @@
         }
 
         .toolbox { 
-            width: 170px; 
+            width: 210px; 
             height: 100%;
             flex-shrink: 0;
-            background: var(--panel-bg); 
+            background: #f8fafc; 
             border-right: 1px solid var(--border-color); 
-            padding: 8px; 
+            padding: 12px 18px; 
             display: flex; 
             flex-direction: column; 
-            gap: 6px; 
+            gap: 10px; 
             overflow-y: auto; 
             z-index: 10; 
+            touch-action: pan-y;
         }
-        .toolbox h2 { font-size: 0.85rem; color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 4px; display: flex; justify-content: space-between; }
-        .tool-item { background: #f8f9fa; border: 2px dashed #bdc3c7; border-radius: 6px; padding: 6px; text-align: center; cursor: grab; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; touch-action: none; }
-        .tool-item:hover { border-color: var(--accent-color); background: #ebf5fb; }
-        .tool-item.disabled { opacity: 0.3; cursor: not-allowed; border-style: solid; background: #e9ecef; }
-        .tool-icon { width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; }
-        .tool-name { font-size: 0.75rem; font-weight: bold; color: #333; }
+        .toolbox h2 { font-size: 0.85rem; color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 4px; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        
+        .tool-item { 
+            background: #ffffff; 
+            border: 1.5px solid #cbd5e1; 
+            border-radius: 10px; 
+            padding: 8px 6px; 
+            text-align: center; 
+            cursor: grab; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+            touch-action: none; 
+            width: 100%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+        }
+        .tool-item:hover { 
+            border-color: var(--accent-color); 
+            background: #f0f9ff; 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(2, 132, 199, 0.15);
+        }
+        .tool-item.disabled { opacity: 0.35; cursor: not-allowed; border-style: solid; background: #e2e8f0; box-shadow: none; transform: none; }
+        .tool-icon { 
+            width: 52px; 
+            height: 52px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.12));
+        }
+        .tool-name { font-size: 0.78rem; font-weight: 700; color: #1e293b; }
         
         .lab-stage { 
             flex: 1; 
             height: 100%;
             position: relative; 
-            background: radial-gradient(circle at center, #ffffff 0%, #e9ecef 100%); 
+            background: radial-gradient(circle at center, #ffffff 0%, #e2e8f0 100%); 
             overflow: hidden; 
             cursor: grab; 
         }
         .lab-stage:active { cursor: grabbing; }
         .pan-wrapper { position: absolute; left: 50%; bottom: 50px; width: 0; height: 0; display: flex; justify-content: center; align-items: flex-end; transform-origin: center bottom; will-change: transform; }
         .pan-wrapper.smooth { transition: transform 0.3s ease-out; }
-        .lab-table { position: absolute; bottom: -50px; left: -1000px; width: 2000px; height: 50px; background: #8d6e63; border-top: 6px solid #6d4c41; }
+        .lab-table { position: absolute; bottom: -50px; left: -1000px; width: 2000px; height: 50px; background: #78350f; border-top: 6px solid #451a03; }
         .setup-container { position: absolute; bottom: 0; left: -160px; width: 320px; height: 380px; z-index: 2; }
-        .slot { position: absolute; transition: all 0.3s ease; }
+        .slot { position: absolute; transition: all 0.3s ease; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15)); }
         
         .controls-panel { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; z-index: 20; width: 95%; }
         .zoom-controls { position: absolute; right: 15px; bottom: 15px; display: flex; flex-direction: column; gap: 6px; z-index: 20; }
-        .zoom-btn { background: rgba(44, 62, 80, 0.8); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn { background: var(--accent-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.82rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; transition: all 0.2s; }
-        .btn.active-on { background: #27ae60 !important; }
+        .zoom-btn { background: rgba(30, 41, 59, 0.85); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); backdrop-filter: blur(4px); }
+        .btn { background: var(--accent-color); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.82rem; box-shadow: 0 2px 4px rgba(0,0,0,0.12); white-space: nowrap; transition: all 0.2s; }
+        .btn.active-on { background: #10b981 !important; }
         .btn-reset { background: var(--danger-color); }
         
-        .flame-luminous { fill: #ff9800; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
-        .flame-nonluminous { fill: #00d2ff; animation: flicker 0.08s infinite alternate; transform-origin: center bottom; }
+        .flame-luminous { fill: url(#grad-luminous); animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
+        .flame-nonluminous { fill: url(#grad-nonluminous); animation: flicker 0.08s infinite alternate; transform-origin: center bottom; }
         @keyframes flicker { 0% { transform: scale(0.95) skewX(-1deg); } 100% { transform: scale(1.05) skewX(1deg); } }
-        .steam-container { position: absolute; top: 80px; left: 130px; width: 60px; height: 80px; pointer-events: none; display: none; }
-        .steam-particle { position: absolute; bottom: 0; background: rgba(255, 255, 255, 0.6); border-radius: 50%; animation: rise 1.8s infinite ease-in; }
+        .steam-container { position: absolute; top: 75px; left: 130px; width: 60px; height: 80px; pointer-events: none; display: none; }
+        .steam-particle { position: absolute; bottom: 0; background: rgba(255, 255, 255, 0.7); border-radius: 50%; animation: rise 1.8s infinite ease-in; filter: blur(2px); }
         @keyframes rise { 0% { opacity: 0.8; transform: translateY(0) scale(0.5); } 100% { opacity: 0; transform: translateY(-60px) scale(2); } }
         
         .guide-panel { 
@@ -292,15 +314,14 @@
             overflow-y: auto; 
         }
         .guide-panel h2 { font-size: 0.9rem; color: var(--primary-color); }
-        .step-card { background: #f8f9fa; border-radius: 6px; padding: 6px 8px; border-left: 4px solid #bdc3c7; font-size: 0.75rem; line-height: 1.3; }
-        .step-card.active { border-left-color: var(--accent-color); background: #ebf5fb; font-weight: bold; }
+        .step-card { background: #f8fafc; border-radius: 6px; padding: 6px 8px; border-left: 4px solid #cbd5e1; font-size: 0.75rem; line-height: 1.3; }
+        .step-card.active { border-left-color: var(--accent-color); background: #f0f9ff; font-weight: bold; }
         .step-card.completed { border-left-color: var(--success-color); opacity: 0.6; }
-        .exam-mask { background: #2c3e50; color: #ecf0f1; border-radius: 8px; padding: 15px; text-align: center; font-size: 0.85rem; line-height: 1.6; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); display: none; }
-        .dashboard { background: #2c3e50; color: #00ffcc; padding: 8px; border-radius: 6px; font-family: monospace; display: flex; flex-direction: column; gap: 4px; margin-top: auto; font-size: 0.8rem; }
+        .exam-mask { background: #0f172a; color: #f8fafc; border-radius: 8px; padding: 15px; text-align: center; font-size: 0.85rem; line-height: 1.6; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); display: none; }
+        .dashboard { background: #0f172a; color: #38bdf8; padding: 10px; border-radius: 8px; font-family: monospace; display: flex; flex-direction: column; gap: 4px; margin-top: auto; font-size: 0.8rem; border: 1px solid #334155; }
         .dashboard-row { display: flex; justify-content: space-between; }
-        .dash-val { font-size: 1rem; font-weight: bold; }
+        .dash-val { font-size: 1.05rem; font-weight: bold; color: #4ade80; }
 
-        /* 內頁低高度模式適應 */
         @media (max-height: 600px) {
             html, body {
                 height: auto;
@@ -318,8 +339,9 @@
         @media (max-width: 950px), (max-height: 500px) {
             header { height: 40px; padding: 4px 8px; }
             header h1 { font-size: 0.8rem; }
-            .toolbox { width: 110px; padding: 4px; }
-            .tool-name { font-size: 0.65rem; }
+            .toolbox { width: 150px; padding: 8px 10px; gap: 8px; }
+            .tool-name { font-size: 0.68rem; }
+            .tool-icon { width: 42px; height: 42px; }
             .guide-panel { width: 150px; padding: 6px; }
             .step-card { padding: 4px; font-size: 0.68rem; }
             .btn { padding: 4px 6px; font-size: 0.72rem; }
@@ -335,14 +357,14 @@
                 <button id="btn-mode-review" class="mode-btn active" onclick="switchMode('review')">📖 複習模式</button>
                 <button id="btn-mode-exam" class="mode-btn" onclick="switchMode('exam')">📝 考試模式</button>
             </div>
-            <span id="status-tag" style="background:#34495e; padding:2px 8px; border-radius:10px; font-size:0.75rem;">請先依順序擺放器材</span>
+            <span id="status-tag" style="background:#334155; padding:2px 8px; border-radius:10px; font-size:0.75rem;">請先依順序擺放器材</span>
             <button class="btn-fullscreen" onclick="toggleFullScreen()">📱 全螢幕</button>
         </div>
     </header>
     <div class="container">
         <div class="toolbox">
-            <h2>器材箱 <span id="tool-count" style="font-size:0.7rem; color:#7f8c8d;"></span></h2>
-            <div id="tools-container" style="display:flex; flex-direction:column; gap:6px;"></div>
+            <h2>器材箱 <span id="tool-count" style="font-size:0.7rem; color:#64748b;"></span></h2>
+            <div id="tools-container" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
         <div class="lab-stage" id="stage">
             <div class="controls-panel">
@@ -364,57 +386,103 @@
                         <div class="steam-particle" style="left:25px; width:16px; height:16px; animation-delay:0.4s;"></div>
                         <div class="steam-particle" style="left:40px; width:10px; height:10px; animation-delay:0.8s;"></div>
                     </div>
-                    <div class="slot" id="slot-mat" style="bottom: 0px; left: 60px; width: 200px; height: 15px; display:none;">
-                        <svg width="200" height="15"><rect x="0" y="0" width="200" height="15" fill="#a6a6a6" rx="3" stroke="#7f8c8d" stroke-width="2"/></svg>
+                    
+                    <!-- 1. 防火墊 -->
+                    <div class="slot" id="slot-mat" style="bottom: 0px; left: 50px; width: 220px; height: 18px; display:none;">
+                        <svg width="220" height="18" viewBox="0 0 220 18">
+                            <rect x="2" y="2" width="216" height="14" fill="#e2e8f0" stroke="#475569" stroke-width="2.5" rx="3"/>
+                            <rect x="6" y="5" width="208" height="8" fill="#cbd5e1" rx="2"/>
+                        </svg>
                     </div>
+
+                    <!-- 5. 本生燈 -->
                     <div class="slot" id="slot-burner" style="bottom: 15px; left: 130px; width: 60px; height: 120px; display:none;">
                         <svg width="60" height="120" viewBox="0 0 60 120">
+                            <defs>
+                                <linearGradient id="grad-luminous" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#ef4444" />
+                                    <stop offset="50%" stop-color="#f97316" />
+                                    <stop offset="100%" stop-color="#eab308" />
+                                </linearGradient>
+                                <linearGradient id="grad-nonluminous" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="60%" stop-color="#0284c7" />
+                                    <stop offset="100%" stop-color="#2563eb" opacity="0.5"/>
+                                </linearGradient>
+                            </defs>
                             <g id="flame-group" style="display:none;">
-                                <path id="flame-luminous" class="flame-luminous" d="M30,5 C20,25 15,35 30,55 C45,35 40,25 30,5 Z" />
-                                <path id="flame-nonluminous" class="flame-nonluminous" d="M30,20 C23,32 20,40 30,55 C40,40 37,32 30,20 Z" style="display:none;" />
+                                <path id="flame-luminous" class="flame-luminous" d="M30,0 C18,22 12,32 30,55 C48,32 42,22 30,0 Z" />
+                                <path id="flame-nonluminous" class="flame-nonluminous" d="M30,15 C22,28 18,36 30,55 C42,36 38,28 30,15 Z" style="display:none;" />
                             </g>
-                            <rect x="10" y="100" width="40" height="15" fill="#2c3e50" rx="2"/>
-                            <rect x="26" y="55" width="8" height="45" fill="#95a5a6"/>
-                            <circle id="air-hole" cx="30" cy="85" r="3.5" fill="#000"/>
-                            <path d="M10,108 C-20,108 -20,120 -40,120" fill="none" stroke="#d35400" stroke-width="5"/>
+                            <rect x="10" y="98" width="40" height="16" fill="#1e293b" rx="3" stroke="#0f172a" stroke-width="2"/>
+                            <rect x="16" y="92" width="28" height="8" fill="#475569" stroke="#0f172a" stroke-width="1.5"/>
+                            <rect x="25" y="50" width="10" height="42" fill="#d97706" stroke="#78350f" stroke-width="1.5"/>
+                            <rect x="27" y="50" width="3" height="42" fill="#fef08a" opacity="0.6"/>
+                            <rect x="23" y="80" width="14" height="10" fill="#64748b" rx="1" stroke="#0f172a" stroke-width="1"/>
+                            <circle id="air-hole" cx="30" cy="85" r="3" fill="#0f172a"/>
+                            <path d="M16,98 C-10,98 -10,118 -35,118" fill="none" stroke="#ea580c" stroke-width="5" stroke-linecap="round"/>
                         </svg>
                     </div>
+
+                    <!-- 2. 三腳架 -->
                     <div class="slot" id="slot-tripod" style="bottom: 15px; left: 85px; width: 150px; height: 160px; display:none;">
                         <svg width="150" height="160" viewBox="0 0 150 160">
-                            <path d="M15,160 L45,10 L105,10 L135,160 M45,10 L75,160" stroke="#4a4a4a" stroke-width="6" fill="none" stroke-linecap="round"/>
-                            <rect x="40" y="5" width="70" height="8" fill="#333" rx="2"/>
+                            <ellipse cx="75" cy="18" rx="55" ry="10" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+                            <ellipse cx="75" cy="18" rx="42" ry="6" fill="#0f172a"/>
+                            <path d="M22,20 L8,158 M128,20 L142,158 M75,22 L75,158" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M22,20 L8,158 M128,20 L142,158 M75,22 L75,158" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <div class="slot" id="slot-gauze" style="bottom: 170px; left: 90px; width: 140px; height: 10px; display:none;">
-                        <svg width="140" height="10" viewBox="0 0 140 10">
-                            <rect x="0" y="1" width="140" height="8" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,2"/>
-                            <ellipse cx="70" cy="5" rx="30" ry="3" fill="#888" opacity="0.7"/>
+
+                    <!-- 3. 鐵絲網 -->
+                    <div class="slot" id="slot-gauze" style="bottom: 165px; left: 88px; width: 144px; height: 14px; display:none;">
+                        <svg width="144" height="14" viewBox="0 0 144 14">
+                            <rect x="2" y="2" width="140" height="10" fill="none" stroke="#334155" stroke-width="2.5" stroke-dasharray="6,2" rx="2"/>
+                            <ellipse cx="72" cy="7" rx="40" ry="4" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
                         </svg>
                     </div>
-                    <div class="slot" id="slot-beaker" style="bottom: 178px; left: 110px; width: 100px; height: 120px; display:none;">
+
+                    <!-- 4. 燒杯 -->
+                    <div class="slot" id="slot-beaker" style="bottom: 175px; left: 110px; width: 100px; height: 120px; display:none;">
                         <svg width="100" height="120" viewBox="0 0 100 120">
-                            <rect id="water" x="8" y="45" width="84" height="68" fill="#3498db" opacity="0.6" rx="2"/>
-                            <path d="M5,5 L5,112 Q5,118 12,118 L88,118 Q95,118 95,112 L95,5" fill="none" stroke="#ffffff" stroke-width="4"/>
-                            <line x1="15" y1="50" x2="35" y2="50" stroke="#fff" stroke-width="2"/>
-                            <line x1="15" y1="90" x2="35" y2="90" stroke="#fff" stroke-width="2"/>
+                            <path id="water" d="M12,48 Q50,52 88,48 L88,110 Q50,116 12,110 Z" fill="#0284c7" opacity="0.75"/>
+                            <ellipse cx="50" cy="48" rx="38" ry="4" fill="#38bdf8" opacity="0.9"/>
+                            <path d="M6,8 L6,110 Q6,117 14,117 L86,117 Q94,117 94,110 L94,8" fill="none" stroke="#0f172a" stroke-width="4"/>
+                            <path d="M3,8 H20 M80,8 H97" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="18" y1="40" x2="35" y2="40" stroke="#0f172a" stroke-width="2"/>
+                            <line x1="18" y1="65" x2="30" y2="65" stroke="#0f172a" stroke-width="2"/>
+                            <line x1="18" y1="90" x2="35" y2="90" stroke="#0f172a" stroke-width="2"/>
+                            <path d="M14,15 L14,105" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
                         </svg>
                     </div>
-                    <div class="slot" id="slot-stand" style="bottom: 15px; left: 20px; width: 180px; height: 350px; display:none;">
+
+                    <!-- 6. 鐵架夾 -->
+                    <div class="slot" id="slot-stand" style="bottom: 15px; left: 15px; width: 180px; height: 350px; display:none;">
                         <svg width="180" height="350" viewBox="0 0 180 350">
-                            <rect x="10" y="335" width="80" height="12" fill="#2c3e50" rx="2"/>
-                            <rect x="25" y="20" width="8" height="315" fill="#7f8c8d"/>
-                            <rect x="23" y="90" width="12" height="15" fill="#333" rx="2"/>
-                            <rect x="35" y="94" width="95" height="7" fill="#7f8c8d"/>
-                            <path d="M125,88 C120,97 140,97 135,88" fill="none" stroke="#e74c3c" stroke-width="4"/>
+                            <rect x="5" y="335" width="85" height="12" fill="#1e293b" rx="3" stroke="#0f172a" stroke-width="2"/>
+                            <rect x="22" y="15" width="7" height="320" fill="#94a3b8" stroke="#334155" stroke-width="1"/>
+                            <rect x="23" y="15" width="2" height="320" fill="#ffffff" opacity="0.7"/>
+                            <rect x="18" y="90" width="15" height="16" rx="2" fill="#0f172a"/>
+                            <rect x="33" y="95" width="95" height="6" fill="#64748b" stroke="#334155" stroke-width="1"/>
+                            <path d="M125,86 C120,102 142,102 137,86" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
                         </svg>
                     </div>
+
+                    <!-- 7. 溫度計 -->
                     <div class="slot" id="slot-thermometer" style="bottom: 180px; left: 140px; width: 20px; height: 180px; display:none;">
                         <svg width="20" height="180" viewBox="0 0 20 180">
-                            <rect x="7" y="0" width="6" height="180" fill="#e5e8e8" stroke="#bdc3c7" stroke-width="1" rx="3"/>
-                            <rect id="thermo-mercury" x="8" y="150" width="4" height="25" fill="#e74c3c"/>
-                            <circle cx="10" cy="175" r="7" fill="#e74c3c"/>
+                            <rect x="7" y="8" width="6" height="145" fill="#fef08a" rx="2"/>
+                            <rect x="5" y="4" width="10" height="152" fill="none" stroke="#0f172a" stroke-width="2" rx="5"/>
+                            <line x1="11" y1="25" x2="14" y2="25" stroke="#0f172a" stroke-width="1"/>
+                            <line x1="11" y1="50" x2="14" y2="50" stroke="#0f172a" stroke-width="1"/>
+                            <line x1="11" y1="75" x2="14" y2="75" stroke="#0f172a" stroke-width="1"/>
+                            <line x1="11" y1="100" x2="14" y2="100" stroke="#0f172a" stroke-width="1"/>
+                            <line x1="11" y1="125" x2="14" y2="125" stroke="#0f172a" stroke-width="1"/>
+                            <rect id="thermo-mercury" x="8.5" y="145" width="3" height="15" fill="#ef4444"/>
+                            <circle cx="10" cy="162" r="7" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"/>
                         </svg>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -438,22 +506,96 @@
             <div class="exam-mask" id="exam-mask">🔒 <b>考試進行中</b><br><br>提示已收起。<br>請憑記憶正確放置器材並操作開關。</div>
             <div class="dashboard">
                 <div class="dashboard-row"><span>水溫：</span><span class="dash-val" id="temp-display">25.0 °C</span></div>
-                <div class="dashboard-row"><span>氣孔狀態：</span><span id="air-status" style="color:#e67e22;">開啟</span></div>
-                <div class="dashboard-row"><span>煤氣狀態：</span><span id="gas-status" style="color:#95a5a6;">關閉</span></div>
-                <div class="dashboard-row"><span>火焰狀態：</span><span id="flame-status" style="color:#95a5a6;">未點燃</span></div>
+                <div class="dashboard-row"><span>氣孔狀態：</span><span id="air-status" style="color:#f59e0b;">開啟</span></div>
+                <div class="dashboard-row"><span>煤氣狀態：</span><span id="gas-status" style="color:#94a3b8;">關閉</span></div>
+                <div class="dashboard-row"><span>火焰狀態：</span><span id="flame-status" style="color:#94a3b8;">未點燃</span></div>
             </div>
         </div>
     </div>
     <script>
+        /* 高解析度對比與立體感的 SVG 器材圖標 */
         const toolsData = [
-            { id: 'mat', name: '防火墊', icon: '<svg width="35" height="8" viewBox="0 0 100 20"><rect x="0" y="0" width="100" height="20" fill="#95a5a6" rx="3"/></svg>' },
-            { id: 'tripod', name: '三腳架', icon: '<svg width="35" height="35" viewBox="0 0 100 100"><path d="M10,90 L30,10 L70,10 L90,90 M30,10 L50,90" stroke="#7f8c8d" stroke-width="8" fill="none"/></svg>' },
-            { id: 'gauze', name: '鐵絲網', icon: '<svg width="35" height="15" viewBox="0 0 100 30"><rect x="5" y="5" width="90" height="20" fill="none" stroke="#444" stroke-width="4" stroke-dasharray="4,2"/></svg>' },
-            { id: 'beaker', name: '燒杯(水)', icon: '<svg width="30" height="35" viewBox="0 0 80 100"><path d="M10,10 L10,90 Q10,95 15,95 L65,95 Q70,95 70,90 L70,10" fill="none" stroke="#3498db" stroke-width="5"/><rect x="12" y="40" width="56" height="52" fill="#3498db" opacity="0.5"/></svg>' },
-            { id: 'burner', name: '本生燈', icon: '<svg width="25" height="35" viewBox="0 0 60 100"><rect x="10" y="80" width="40" height="15" fill="#34495e"/><rect x="25" y="20" width="10" height="60" fill="#7f8c8d"/></svg>' },
-            { id: 'stand', name: '鐵架/夾', icon: '<svg width="25" height="35" viewBox="0 0 60 100"><rect x="10" y="85" width="40" height="10" fill="#2c3e50"/><rect x="15" y="10" width="6" height="75" fill="#7f8c8d"/><rect x="18" y="25" width="25" height="6" fill="#e74c3c"/></svg>' },
-            { id: 'thermometer', name: '溫度計', icon: '<svg width="12" height="35" viewBox="0 0 20 100"><rect x="7" y="0" width="6" height="85" fill="#e5e8e8" stroke="#bdc3c7" stroke-width="1" rx="3"/><circle cx="10" cy="85" r="7" fill="#e74c3c"/></svg>' }
+            { 
+                id: 'mat', 
+                name: '防火墊', 
+                icon: `<svg width="48" height="20" viewBox="0 0 100 40">
+                    <rect x="5" y="10" width="90" height="20" fill="#e2e8f0" stroke="#0f172a" stroke-width="3" rx="4"/>
+                    <rect x="9" y="14" width="82" height="12" fill="#cbd5e1" rx="2"/>
+                </svg>` 
+            },
+            { 
+                id: 'tripod', 
+                name: '三腳架', 
+                icon: `<svg width="45" height="45" viewBox="0 0 100 100">
+                    <ellipse cx="50" cy="20" rx="35" ry="8" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
+                    <ellipse cx="50" cy="20" rx="26" ry="5" fill="#0f172a"/>
+                    <path d="M 20 22 L 8 90 M 80 22 L 92 90 M 50 24 L 50 92" stroke="#334155" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M 20 22 L 8 90 M 80 22 L 92 90 M 50 24 L 50 92" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+                </svg>` 
+            },
+            { 
+                id: 'gauze', 
+                name: '鐵絲網', 
+                icon: `<svg width="46" height="30" viewBox="0 0 100 60">
+                    <rect x="5" y="10" width="90" height="40" fill="none" stroke="#1e293b" stroke-width="4" stroke-dasharray="8,3" rx="4"/>
+                    <ellipse cx="50" cy="30" rx="26" ry="14" fill="#f8fafc" stroke="#64748b" stroke-width="2.5"/>
+                </svg>` 
+            },
+            { 
+                id: 'beaker', 
+                name: '燒杯(水)', 
+                icon: `<svg width="40" height="45" viewBox="0 0 80 90">
+                    <path d="M 15 35 Q 40 40 65 35 L 65 80 Q 40 85 15 80 Z" fill="#0284c7" opacity="0.8"/>
+                    <ellipse cx="40" cy="35" rx="25" ry="5" fill="#38bdf8"/>
+                    <path d="M 10 10 L 10 80 Q 10 88 18 88 L 62 88 Q 70 88 70 80 L 70 10" fill="none" stroke="#0f172a" stroke-width="4"/>
+                    <path d="M 6 10 H 20 M 60 10 H 74" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="20" y1="30" x2="35" y2="30" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="20" y1="50" x2="30" y2="50" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="20" y1="70" x2="35" y2="70" stroke="#0f172a" stroke-width="2"/>
+                    <path d="M 16 15 L 16 75" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+                </svg>` 
+            },
+            { 
+                id: 'burner', 
+                name: '本生燈', 
+                icon: `<svg width="40" height="45" viewBox="0 0 70 90">
+                    <rect x="15" y="72" width="40" height="14" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="20" y="65" width="30" height="8" rx="1" fill="#475569" stroke="#0f172a" stroke-width="1"/>
+                    <rect x="29" y="15" width="12" height="52" fill="#d97706" stroke="#78350f" stroke-width="1.5"/>
+                    <rect x="31" y="15" width="3" height="52" fill="#fef08a" opacity="0.6"/>
+                    <rect x="27" y="52" width="16" height="10" fill="#64748b" rx="1" stroke="#0f172a" stroke-width="1"/>
+                    <circle cx="35" cy="57" r="3" fill="#0f172a"/>
+                    <path d="M 22 72 C 5 72 5 85 -5 85" fill="none" stroke="#ea580c" stroke-width="5" stroke-linecap="round"/>
+                </svg>` 
+            },
+            { 
+                id: 'stand', 
+                name: '鐵架/夾', 
+                icon: `<svg width="40" height="45" viewBox="0 0 70 90">
+                    <rect x="10" y="78" width="50" height="8" fill="#1e293b" rx="2" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="18" y="8" width="6" height="70" fill="#94a3b8" stroke="#334155" stroke-width="1"/>
+                    <rect x="19" y="8" width="2" height="70" fill="#ffffff" opacity="0.7"/>
+                    <rect x="15" y="28" width="12" height="12" rx="2" fill="#0f172a"/>
+                    <rect x="27" y="32" width="30" height="4" fill="#64748b"/>
+                    <path d="M 50 25 C 62 25 62 43 50 43" fill="none" stroke="#ef4444" stroke-width="4.5" stroke-linecap="round"/>
+                </svg>` 
+            },
+            { 
+                id: 'thermometer', 
+                name: '溫度計', 
+                icon: `<svg width="25" height="45" viewBox="0 0 30 90">
+                    <rect x="11" y="6" width="8" height="70" fill="#fef08a" rx="3"/>
+                    <rect x="9" y="3" width="12" height="76" fill="none" stroke="#0f172a" stroke-width="2.5" rx="6"/>
+                    <line x1="15" y1="18" x2="18" y2="18" stroke="#0f172a" stroke-width="1.5"/>
+                    <line x1="15" y1="30" x2="18" y2="30" stroke="#0f172a" stroke-width="1.5"/>
+                    <line x1="15" y1="42" x2="18" y2="42" stroke="#0f172a" stroke-width="1.5"/>
+                    <line x1="15" y1="54" x2="18" y2="54" stroke="#0f172a" stroke-width="1.5"/>
+                    <line x1="13" y1="35" x2="13" y2="72" stroke="#ef4444" stroke-width="3"/>
+                    <circle cx="15" cy="74" r="6.5" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"/>
+                </svg>` 
+            }
         ];
+
         const stepTools = ['mat', 'tripod', 'gauze', 'beaker', 'burner', 'stand', 'thermometer'];
         let currentMode = 'review', currentStep = 0, temperature = 25.0, isAirOpen = true, isGasOpen = false, isLit = false, isNonLuminous = false, timer = null;
         const stage = document.getElementById('stage'), panContainer = document.getElementById('pan-container'), btnAir = document.getElementById('btn-air'), btnGas = document.getElementById('btn-gas'), btnLighter = document.getElementById('btn-lighter'), btnReset = document.getElementById('btn-reset'), statusTag = document.getElementById('status-tag'), toolsContainer = document.getElementById('tools-container');
@@ -530,8 +672,8 @@
             if (e.currentTarget.classList.contains('disabled')) return;
             isDraggingTool = true; draggedTool = e.currentTarget.dataset.tool;
             touchClone = e.currentTarget.cloneNode(true);
-            touchClone.style.position = 'fixed'; touchClone.style.zIndex = '9999'; touchClone.style.opacity = '0.8'; touchClone.style.pointerEvents = 'none'; touchClone.style.width = e.currentTarget.offsetWidth + 'px';
-            touchClone.classList.remove('tool-item'); touchClone.style.background = '#ebf5fb'; touchClone.style.border = '2px dashed #3498db';
+            touchClone.style.position = 'fixed'; touchClone.style.zIndex = '9999'; touchClone.style.opacity = '0.85'; touchClone.style.pointerEvents = 'none'; touchClone.style.width = e.currentTarget.offsetWidth + 'px';
+            touchClone.classList.remove('tool-item'); touchClone.style.background = '#ffffff'; touchClone.style.border = '2px solid #0284c7'; touchClone.style.borderRadius = '10px'; touchClone.style.boxShadow = '0 8px 16px rgba(0,0,0,0.2)';
             document.body.appendChild(touchClone); updateClonePosition(e.touches[0]);
         }
         function handleTouchMove(e) { if (touchClone) { e.preventDefault(); updateClonePosition(e.touches[0]); } }
@@ -574,21 +716,21 @@
             if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
             if (currentStep === 7) {
                 isAirOpen = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
-                document.getElementById('air-hole').setAttribute('fill', '#95a5a6');
-                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#2ecc71";
+                document.getElementById('air-hole').setAttribute('fill', '#94a3b8');
+                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#10b981";
                 statusTag.innerText = "氣孔已關閉，請開啟煤氣"; advanceStep(); return;
             }
             if (currentStep === 8 || currentStep === 9) return alert("⚠️ 安全警告：開啟煤氣與點火前，氣孔必須保持關閉！");
             if (currentStep === 10) {
                 isAirOpen = true; isNonLuminous = true; btnAir.innerText = "🌀 氣孔 (開)"; btnAir.classList.remove('active-on');
-                document.getElementById('air-hole').setAttribute('fill', '#000');
-                document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#e67e22";
+                document.getElementById('air-hole').setAttribute('fill', '#0f172a');
+                document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#f59e0b";
                 updateFlameState(); advanceStep(); startMainLoop(); statusTag.innerText = "無光焰加熱中。實驗結束時請先【關閉氣孔】"; return;
             }
             if (currentStep === 11) {
                 isAirOpen = false; isNonLuminous = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
-                document.getElementById('air-hole').setAttribute('fill', '#95a5a6');
-                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#2ecc71";
+                document.getElementById('air-hole').setAttribute('fill', '#94a3b8');
+                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#10b981";
                 updateFlameState(); advanceStep(); statusTag.innerText = "已轉回有光焰，請【關閉煤氣】熄滅火焰"; return;
             }
             if (currentStep >= 12) alert("💡 本生燈已安全關閉。");
@@ -599,7 +741,7 @@
             if (currentStep === 7) return alert("⚠️ 安全警告：開啟煤氣前，必須先關閉氣孔！");
             if (currentStep === 8) {
                 isGasOpen = true; btnGas.innerText = "⛽ 煤氣 (開)"; btnGas.classList.add('active-on');
-                document.getElementById('gas-status').innerText = "開啟"; document.getElementById('gas-status').style.color = "#2ecc71";
+                document.getElementById('gas-status').innerText = "開啟"; document.getElementById('gas-status').style.color = "#10b981";
                 statusTag.innerText = "煤氣已開啟，請點火"; advanceStep(); return;
             }
             if (currentStep === 9 || currentStep === 10) return alert("⚠️ 安全警告：熄滅本生燈前，必須先關閉氣孔轉為有光焰！");
@@ -607,7 +749,7 @@
             if (currentStep === 12) {
                 isGasOpen = false; isLit = false; isNonLuminous = false;
                 btnGas.innerText = "⛽ 煤氣 (關)"; btnGas.classList.remove('active-on');
-                document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#95a5a6";
+                document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#94a3b8";
                 updateFlameState(); advanceStep();
                 if (currentMode === 'exam') { statusTag.innerText = "🎉 考試完成！恭喜安全完成實驗！"; setTimeout(() => alert("🎉 恭喜你！成功按照正確步驟完成了本生燈加熱水實驗！"), 200); }
                 else statusTag.innerText = "🎉 本生燈已安全熄滅，實驗完成！";
@@ -630,9 +772,9 @@
             const flameStatus = document.getElementById('flame-status'), flameGroup = document.getElementById('flame-group'), flameNonLuminous = document.getElementById('flame-nonluminous');
             if (isLit) {
                 flameGroup.style.display = 'block';
-                if (isNonLuminous) { flameNonLuminous.style.display = 'block'; flameStatus.innerText = "無光焰 (加熱中)"; flameStatus.style.color = "#00d2ff"; }
-                else { flameNonLuminous.style.display = 'none'; flameStatus.innerText = "有光焰 (安全焰)"; flameStatus.style.color = "#f1c40f"; }
-            } else { flameGroup.style.display = 'none'; flameStatus.innerText = "未點燃"; flameStatus.style.color = "#95a5a6"; }
+                if (isNonLuminous) { flameNonLuminous.style.display = 'block'; flameStatus.innerText = "無光焰 (加熱中)"; flameStatus.style.color = "#38bdf8"; }
+                else { flameNonLuminous.style.display = 'none'; flameStatus.innerText = "有光焰 (安全焰)"; flameStatus.style.color = "#f59e0b"; }
+            } else { flameGroup.style.display = 'none'; flameStatus.innerText = "未點燃"; flameStatus.style.color = "#94a3b8"; }
         }
 
         function startMainLoop() {
@@ -642,8 +784,8 @@
                 else if (!isLit) temperature -= 0.3;
                 temperature = Math.max(25.0, Math.min(100.0, temperature));
                 document.getElementById('temp-display').innerText = temperature.toFixed(1) + " °C";
-                document.getElementById('thermo-mercury').setAttribute('height', 25 + (temperature - 25) * 1.1);
-                document.getElementById('thermo-mercury').setAttribute('y', 175 - (25 + (temperature - 25) * 1.1));
+                document.getElementById('thermo-mercury').setAttribute('height', 15 + (temperature - 25) * 1.1);
+                document.getElementById('thermo-mercury').setAttribute('y', 160 - (15 + (temperature - 25) * 1.1));
                 document.getElementById('steam').style.display = (temperature > 70) ? 'block' : 'none';
             }, 200);
         }
@@ -653,18 +795,18 @@
             document.querySelectorAll('.slot').forEach(s => s.style.display = 'none');
             document.getElementById('flame-group').style.display = 'none';
             document.getElementById('flame-nonluminous').style.display = 'none';
-            document.getElementById('air-hole').setAttribute('fill', '#000');
+            document.getElementById('air-hole').setAttribute('fill', '#0f172a');
             document.getElementById('steam').style.display = 'none';
             renderToolbox();
             document.querySelectorAll('.step-card').forEach((c, idx) => { c.classList.remove('active', 'completed'); if (idx === 0) c.classList.add('active'); });
             document.getElementById('temp-display').innerText = "25.0 °C";
-            document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#e67e22";
-            document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#95a5a6";
-            document.getElementById('flame-status').innerText = "未點燃"; document.getElementById('flame-status').style.color = "#95a5a6";
+            document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#f59e0b";
+            document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#94a3b8";
+            document.getElementById('flame-status').innerText = "未點燃"; document.getElementById('flame-status').style.color = "#94a3b8";
             btnAir.classList.remove('active-on'); btnAir.innerText = "🌀 氣孔 (開)";
             btnGas.classList.remove('active-on'); btnGas.innerText = "⛽ 煤氣 (關)";
-            document.getElementById('thermo-mercury').setAttribute('height', 25);
-            document.getElementById('thermo-mercury').setAttribute('y', 150);
+            document.getElementById('thermo-mercury').setAttribute('height', 15);
+            document.getElementById('thermo-mercury').setAttribute('y', 145);
             document.querySelector('.guide-panel').scrollTop = 0;
             statusTag.innerText = (currentMode === 'exam') ? "📝 考試模式進行中" : "請先依順序擺放器材";
             resetViewPort();
@@ -684,7 +826,6 @@
 </html>
     </template>
 
-    <!-- 切換實驗模擬器的腳本 -->
     <script>
         const labFrame = document.getElementById('lab-frame');
         const bunsenCode = document.getElementById('bunsen-code').innerHTML;
