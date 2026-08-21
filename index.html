@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虛擬科學實驗室平台</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #0f172a;
+            overflow: hidden;
+        }
+
+        /* 主平台頂部導航列 */
+        .portal-header {
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 54px;
+            z-index: 1000;
+        }
+
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f8fafc;
+            font-weight: bold;
+            font-size: 1.05rem;
+            white-space: nowrap;
+        }
+
+        .portal-brand span {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 實驗選擇標籤頁 */
+        .exp-selector-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 8px;
+            scrollbar-width: thin;
+        }
+
+        .exp-tab {
+            background-color: #334155;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .exp-tab:hover {
+            background-color: #475569;
+            color: #f8fafc;
+        }
+
+        .exp-tab.active {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+        }
+
+        .exp-tab .badge {
+            font-size: 0.65rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* 模擬器載入區 */
+        .stage-container {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 54px);
+            position: relative;
+            background-color: #0f172a;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .portal-brand span {
+                display: none;
+            }
+            .exp-tab {
+                padding: 5px 10px;
+                font-size: 0.78rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 平台頂部導航列 -->
+    <header class="portal-header">
+        <div class="portal-brand">
+            🔬 <span>虛擬科學實驗室</span>
+        </div>
+
+        <div class="exp-selector-container">
+            <button class="exp-tab active" onclick="switchLab('bunsen', this)">
+                🧪 本生燈加熱水 <span class="badge">已上線</span>
+            </button>
+            <button class="exp-tab" onclick="switchLab('titration', this)">
+                ⚖️ 酸鹼滴定實驗 <span class="badge">籌備中</span>
+            </button>
+            <button class="exp-tab" onclick="switchLab('induction', this)">
+                🧲 電磁感應實驗 <span class="badge">籌備中</span>
+            </button>
+            <button class="exp-tab" onclick="switchLab('optics', this)">
+                🌈 光線折射與反射 <span class="badge">籌備中</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 模擬器內容展示區 -->
+    <div class="stage-container">
+        <iframe id="lab-frame" title="實驗模擬器展示區"></iframe>
+    </div>
+
+    <!-- 本生燈實驗原始碼存放區 -->
+    <template id="bunsen-code">
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>虛擬科學實驗室 - 本生燈加熱水實驗</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #2ecc71;
+            --warning-color: #e67e22;
+            --danger-color: #e74c3c;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; user-select: none; -webkit-user-select: none; }
+        body { background-color: var(--bg-color); height: 100vh; display: flex; flex-direction: column; overflow: hidden; touch-action: none; }
+        header { background-color: var(--primary-color); color: white; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 48px; z-index: 100; }
+        header h1 { font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+        .header-controls { display: flex; align-items: center; gap: 8px; }
+        .mode-switch { display: flex; background: #1a252f; padding: 2px; border-radius: 6px; }
+        .mode-btn { background: transparent; color: #bdc3c7; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .mode-btn.active { background: var(--accent-color); color: white; }
+        .btn-fullscreen { background: #4a69bd; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .container { display: flex; flex: 1; height: calc(100vh - 48px); position: relative; }
+        .toolbox { width: 170px; background: var(--panel-bg); border-right: 1px solid var(--border-color); padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; z-index: 10; }
+        .toolbox h2 { font-size: 0.85rem; color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 4px; display: flex; justify-content: space-between; }
+        .tool-item { background: #f8f9fa; border: 2px dashed #bdc3c7; border-radius: 6px; padding: 6px; text-align: center; cursor: grab; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; touch-action: none; }
+        .tool-item:hover { border-color: var(--accent-color); background: #ebf5fb; }
+        .tool-item.disabled { opacity: 0.3; cursor: not-allowed; border-style: solid; background: #e9ecef; }
+        .tool-icon { width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; }
+        .tool-name { font-size: 0.75rem; font-weight: bold; color: #333; }
+        .lab-stage { flex: 1; position: relative; background: radial-gradient(circle at center, #ffffff 0%, #e9ecef 100%); overflow: hidden; cursor: grab; }
+        .lab-stage:active { cursor: grabbing; }
+        .pan-wrapper { position: absolute; left: 50%; bottom: 50px; width: 0; height: 0; display: flex; justify-content: center; align-items: flex-end; transform-origin: center bottom; will-change: transform; }
+        .pan-wrapper.smooth { transition: transform 0.3s ease-out; }
+        .lab-table { position: absolute; bottom: -50px; left: -1000px; width: 2000px; height: 50px; background: #8d6e63; border-top: 6px solid #6d4c41; }
+        .setup-container { position: absolute; bottom: 0; left: -160px; width: 320px; height: 380px; z-index: 2; }
+        .slot { position: absolute; transition: all 0.3s ease; }
+        .controls-panel { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; z-index: 20; width: 95%; }
+        .zoom-controls { position: absolute; right: 15px; bottom: 15px; display: flex; flex-direction: column; gap: 6px; z-index: 20; }
+        .zoom-btn { background: rgba(44, 62, 80, 0.8); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn { background: var(--accent-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.82rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; transition: all 0.2s; }
+        .btn.active-on { background: #27ae60 !important; }
+        .btn-reset { background: var(--danger-color); }
+        .flame-luminous { fill: #ff9800; animation: flicker 0.1s infinite alternate; transform-origin: center bottom; }
+        .flame-nonluminous { fill: #00d2ff; animation: flicker 0.08s infinite alternate; transform-origin: center bottom; }
+        @keyframes flicker { 0% { transform: scale(0.95) skewX(-1deg); } 100% { transform: scale(1.05) skewX(1deg); } }
+        .steam-container { position: absolute; top: 80px; left: 130px; width: 60px; height: 80px; pointer-events: none; display: none; }
+        .steam-particle { position: absolute; bottom: 0; background: rgba(255, 255, 255, 0.6); border-radius: 50%; animation: rise 1.8s infinite ease-in; }
+        @keyframes rise { 0% { opacity: 0.8; transform: translateY(0) scale(0.5); } 100% { opacity: 0; transform: translateY(-60px) scale(2); } }
+        .guide-panel { width: 240px; background: var(--panel-bg); border-left: 1px solid var(--border-color); padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+        .guide-panel h2 { font-size: 0.9rem; color: var(--primary-color); }
+        .step-card { background: #f8f9fa; border-radius: 6px; padding: 6px 8px; border-left: 4px solid #bdc3c7; font-size: 0.75rem; line-height: 1.3; }
+        .step-card.active { border-left-color: var(--accent-color); background: #ebf5fb; font-weight: bold; }
+        .step-card.completed { border-left-color: var(--success-color); opacity: 0.6; }
+        .exam-mask { background: #2c3e50; color: #ecf0f1; border-radius: 8px; padding: 15px; text-align: center; font-size: 0.85rem; line-height: 1.6; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); display: none; }
+        .dashboard { background: #2c3e50; color: #00ffcc; padding: 8px; border-radius: 6px; font-family: monospace; display: flex; flex-direction: column; gap: 4px; margin-top: auto; font-size: 0.8rem; }
+        .dashboard-row { display: flex; justify-content: space-between; }
+        .dash-val { font-size: 1rem; font-weight: bold; }
+        @media (max-width: 950px), (max-height: 500px) {
+            header { height: 40px; padding: 4px 8px; }
+            header h1 { font-size: 0.8rem; }
+            .container { height: calc(100vh - 40px); }
+            .toolbox { width: 95px; padding: 4px; }
+            .tool-name { font-size: 0.65rem; }
+            .guide-panel { width: 140px; padding: 6px; }
+            .step-card { padding: 4px; font-size: 0.68rem; }
+            .btn { padding: 4px 6px; font-size: 0.72rem; }
+            .mode-btn { padding: 3px 6px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧪 本生燈加熱水實驗</h1>
+        <div class="header-controls">
+            <div class="mode-switch">
+                <button id="btn-mode-review" class="mode-btn active" onclick="switchMode('review')">📖 複習模式</button>
+                <button id="btn-mode-exam" class="mode-btn" onclick="switchMode('exam')">📝 考試模式</button>
+            </div>
+            <span id="status-tag" style="background:#34495e; padding:2px 8px; border-radius:10px; font-size:0.75rem;">請先依順序擺放器材</span>
+            <button class="btn-fullscreen" onclick="toggleFullScreen()">📱 全螢幕</button>
+        </div>
+    </header>
+    <div class="container">
+        <div class="toolbox">
+            <h2>器材箱 <span id="tool-count" style="font-size:0.7rem; color:#7f8c8d;"></span></h2>
+            <div id="tools-container" style="display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+        <div class="lab-stage" id="stage">
+            <div class="controls-panel">
+                <button class="btn" id="btn-air">🌀 氣孔 (開)</button>
+                <button class="btn" id="btn-gas">⛽ 煤氣 (關)</button>
+                <button class="btn" id="btn-lighter">🔥 點火</button>
+                <button class="btn btn-reset" id="btn-reset">🔄 重置</button>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomView(0.2)">➕</button>
+                <button class="zoom-btn" onclick="zoomView(-0.2)">➖</button>
+                <button class="zoom-btn" onclick="resetViewPort()">🎯</button>
+            </div>
+            <div class="pan-wrapper smooth" id="pan-container">
+                <div class="lab-table"></div>
+                <div class="setup-container" id="drop-zone">
+                    <div class="steam-container" id="steam">
+                        <div class="steam-particle" style="left:10px; width:12px; height:12px; animation-delay:0s;"></div>
+                        <div class="steam-particle" style="left:25px; width:16px; height:16px; animation-delay:0.4s;"></div>
+                        <div class="steam-particle" style="left:40px; width:10px; height:10px; animation-delay:0.8s;"></div>
+                    </div>
+                    <div class="slot" id="slot-mat" style="bottom: 0px; left: 60px; width: 200px; height: 15px; display:none;">
+                        <svg width="200" height="15"><rect x="0" y="0" width="200" height="15" fill="#a6a6a6" rx="3" stroke="#7f8c8d" stroke-width="2"/></svg>
+                    </div>
+                    <div class="slot" id="slot-burner" style="bottom: 15px; left: 130px; width: 60px; height: 120px; display:none;">
+                        <svg width="60" height="120" viewBox="0 0 60 120">
+                            <g id="flame-group" style="display:none;">
+                                <path id="flame-luminous" class="flame-luminous" d="M30,5 C20,25 15,35 30,55 C45,35 40,25 30,5 Z" />
+                                <path id="flame-nonluminous" class="flame-nonluminous" d="M30,20 C23,32 20,40 30,55 C40,40 37,32 30,20 Z" style="display:none;" />
+                            </g>
+                            <rect x="10" y="100" width="40" height="15" fill="#2c3e50" rx="2"/>
+                            <rect x="26" y="55" width="8" height="45" fill="#95a5a6"/>
+                            <circle id="air-hole" cx="30" cy="85" r="3.5" fill="#000"/>
+                            <path d="M10,108 C-20,108 -20,120 -40,120" fill="none" stroke="#d35400" stroke-width="5"/>
+                        </svg>
+                    </div>
+                    <div class="slot" id="slot-tripod" style="bottom: 15px; left: 85px; width: 150px; height: 160px; display:none;">
+                        <svg width="150" height="160" viewBox="0 0 150 160">
+                            <path d="M15,160 L45,10 L105,10 L135,160 M45,10 L75,160" stroke="#4a4a4a" stroke-width="6" fill="none" stroke-linecap="round"/>
+                            <rect x="40" y="5" width="70" height="8" fill="#333" rx="2"/>
+                        </svg>
+                    </div>
+                    <div class="slot" id="slot-gauze" style="bottom: 170px; left: 90px; width: 140px; height: 10px; display:none;">
+                        <svg width="140" height="10" viewBox="0 0 140 10">
+                            <rect x="0" y="1" width="140" height="8" fill="none" stroke="#333" stroke-width="2" stroke-dasharray="5,2"/>
+                            <ellipse cx="70" cy="5" rx="30" ry="3" fill="#888" opacity="0.7"/>
+                        </svg>
+                    </div>
+                    <div class="slot" id="slot-beaker" style="bottom: 178px; left: 110px; width: 100px; height: 120px; display:none;">
+                        <svg width="100" height="120" viewBox="0 0 100 120">
+                            <rect id="water" x="8" y="45" width="84" height="68" fill="#3498db" opacity="0.6" rx="2"/>
+                            <path d="M5,5 L5,112 Q5,118 12,118 L88,118 Q95,118 95,112 L95,5" fill="none" stroke="#ffffff" stroke-width="4"/>
+                            <line x1="15" y1="50" x2="35" y2="50" stroke="#fff" stroke-width="2"/>
+                            <line x1="15" y1="90" x2="35" y2="90" stroke="#fff" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="slot" id="slot-stand" style="bottom: 15px; left: 20px; width: 180px; height: 350px; display:none;">
+                        <svg width="180" height="350" viewBox="0 0 180 350">
+                            <rect x="10" y="335" width="80" height="12" fill="#2c3e50" rx="2"/>
+                            <rect x="25" y="20" width="8" height="315" fill="#7f8c8d"/>
+                            <rect x="23" y="90" width="12" height="15" fill="#333" rx="2"/>
+                            <rect x="35" y="94" width="95" height="7" fill="#7f8c8d"/>
+                            <path d="M125,88 C120,97 140,97 135,88" fill="none" stroke="#e74c3c" stroke-width="4"/>
+                        </svg>
+                    </div>
+                    <div class="slot" id="slot-thermometer" style="bottom: 180px; left: 140px; width: 20px; height: 180px; display:none;">
+                        <svg width="20" height="180" viewBox="0 0 20 180">
+                            <rect x="7" y="0" width="6" height="180" fill="#e5e8e8" stroke="#bdc3c7" stroke-width="1" rx="3"/>
+                            <rect id="thermo-mercury" x="8" y="150" width="4" height="25" fill="#e74c3c"/>
+                            <circle cx="10" cy="175" r="7" fill="#e74c3c"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="guide-panel">
+            <h2>實驗指引</h2>
+            <div id="steps-list" style="display:flex; flex-direction:column; gap:6px;">
+                <div class="step-card active" id="step-0">1. 放【防火墊】</div>
+                <div class="step-card" id="step-1">2. 放【三腳架】</div>
+                <div class="step-card" id="step-2">3. 放【鐵絲網】</div>
+                <div class="step-card" id="step-3">4. 放裝水【燒杯】</div>
+                <div class="step-card" id="step-4">5. 移入【本生燈】</div>
+                <div class="step-card" id="step-5">6. 放置【鐵架鐵夾】</div>
+                <div class="step-card" id="step-6">7. 夾好【溫度計】</div>
+                <div class="step-card" id="step-7">8. 關閉氣孔 (開煤氣前)</div>
+                <div class="step-card" id="step-8">9. 開啟煤氣</div>
+                <div class="step-card" id="step-9">10. 點火 (有光焰)</div>
+                <div class="step-card" id="step-10">11. 開氣孔 (無光焰加熱)</div>
+                <div class="step-card" id="step-11">12. 關閉氣孔 (熄火前)</div>
+                <div class="step-card" id="step-12">13. 關閉煤氣 (熄滅火焰)</div>
+            </div>
+            <div class="exam-mask" id="exam-mask">🔒 <b>考試進行中</b><br><br>提示已收起。<br>請憑記憶正確放置器材並操作開關。</div>
+            <div class="dashboard">
+                <div class="dashboard-row"><span>水溫：</span><span class="dash-val" id="temp-display">25.0 °C</span></div>
+                <div class="dashboard-row"><span>氣孔狀態：</span><span id="air-status" style="color:#e67e22;">開啟</span></div>
+                <div class="dashboard-row"><span>煤氣狀態：</span><span id="gas-status" style="color:#95a5a6;">關閉</span></div>
+                <div class="dashboard-row"><span>火焰狀態：</span><span id="flame-status" style="color:#95a5a6;">未點燃</span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const toolsData = [
+            { id: 'mat', name: '防火墊', icon: '<svg width="35" height="8" viewBox="0 0 100 20"><rect x="0" y="0" width="100" height="20" fill="#95a5a6" rx="3"/></svg>' },
+            { id: 'tripod', name: '三腳架', icon: '<svg width="35" height="35" viewBox="0 0 100 100"><path d="M10,90 L30,10 L70,10 L90,90 M30,10 L50,90" stroke="#7f8c8d" stroke-width="8" fill="none"/></svg>' },
+            { id: 'gauze', name: '鐵絲網', icon: '<svg width="35" height="15" viewBox="0 0 100 30"><rect x="5" y="5" width="90" height="20" fill="none" stroke="#444" stroke-width="4" stroke-dasharray="4,2"/></svg>' },
+            { id: 'beaker', name: '燒杯(水)', icon: '<svg width="30" height="35" viewBox="0 0 80 100"><path d="M10,10 L10,90 Q10,95 15,95 L65,95 Q70,95 70,90 L70,10" fill="none" stroke="#3498db" stroke-width="5"/><rect x="12" y="40" width="56" height="52" fill="#3498db" opacity="0.5"/></svg>' },
+            { id: 'burner', name: '本生燈', icon: '<svg width="25" height="35" viewBox="0 0 60 100"><rect x="10" y="80" width="40" height="15" fill="#34495e"/><rect x="25" y="20" width="10" height="60" fill="#7f8c8d"/></svg>' },
+            { id: 'stand', name: '鐵架/夾', icon: '<svg width="25" height="35" viewBox="0 0 60 100"><rect x="10" y="85" width="40" height="10" fill="#2c3e50"/><rect x="15" y="10" width="6" height="75" fill="#7f8c8d"/><rect x="18" y="25" width="25" height="6" fill="#e74c3c"/></svg>' },
+            { id: 'thermometer', name: '溫度計', icon: '<svg width="12" height="35" viewBox="0 0 20 100"><rect x="7" y="0" width="6" height="85" fill="#e5e8e8" stroke="#bdc3c7" stroke-width="1" rx="3"/><circle cx="10" cy="85" r="7" fill="#e74c3c"/></svg>' }
+        ];
+        const stepTools = ['mat', 'tripod', 'gauze', 'beaker', 'burner', 'stand', 'thermometer'];
+        let currentMode = 'review', currentStep = 0, temperature = 25.0, isAirOpen = true, isGasOpen = false, isLit = false, isNonLuminous = false, timer = null;
+        const stage = document.getElementById('stage'), panContainer = document.getElementById('pan-container'), btnAir = document.getElementById('btn-air'), btnGas = document.getElementById('btn-gas'), btnLighter = document.getElementById('btn-lighter'), btnReset = document.getElementById('btn-reset'), statusTag = document.getElementById('status-tag'), toolsContainer = document.getElementById('tools-container');
+
+        function renderToolbox() {
+            toolsContainer.innerHTML = '';
+            let list = [...toolsData];
+            if (currentMode === 'exam') list.sort(() => Math.random() - 0.5);
+            list.forEach((tool) => {
+                const div = document.createElement('div');
+                div.className = 'tool-item'; div.setAttribute('draggable', 'true'); div.id = `tool-${tool.id}`; div.dataset.tool = tool.id;
+                const displayName = (currentMode === 'review') ? `${stepTools.indexOf(tool.id)+1}. ${tool.name}` : tool.name;
+                div.innerHTML = `<div class="tool-icon">${tool.icon}</div><div class="tool-name">${displayName}</div>`;
+                div.addEventListener('dragstart', handleDragStart); div.addEventListener('touchstart', handleTouchStart, {passive: false}); div.addEventListener('touchmove', handleTouchMove, {passive: false}); div.addEventListener('touchend', handleTouchEnd);
+                toolsContainer.appendChild(div);
+            });
+        }
+
+        function switchMode(mode) {
+            if (currentMode === mode) return;
+            if (currentMode === 'exam' && currentStep > 0 && currentStep < 12) { if (!confirm('切換模式將視為「放棄考試」，確定切換？')) return; }
+            currentMode = mode;
+            document.getElementById('btn-mode-review').classList.toggle('active', mode === 'review');
+            document.getElementById('btn-mode-exam').classList.toggle('active', mode === 'exam');
+            document.getElementById('steps-list').style.display = (mode === 'exam') ? 'none' : 'flex';
+            document.getElementById('exam-mask').style.display = (mode === 'exam') ? 'block' : 'none';
+            btnReset.innerText = (mode === 'exam') ? '🏳️ 放棄重來' : '🔄 重置';
+            statusTag.innerText = (mode === 'exam') ? '📝 考試模式進行中' : '📖 複習模式';
+            resetExperiment();
+        }
+
+        let viewScale = 1, panX = 0, panY = 0, isPanning = false, isDraggingTool = false, startX = 0, startY = 0, initialPinchDist = null, initialScale = 1;
+        function autoFitView() {
+            const h = stage.clientHeight;
+            if (h < 450) { viewScale = Math.max(0.4, h / 500); panY = -30; } else { viewScale = 1; panY = 0; }
+            panX = 0; updateTransform();
+        }
+        window.addEventListener('resize', autoFitView);
+        window.addEventListener('load', () => { autoFitView(); renderToolbox(); });
+        function updateTransform() { panContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${viewScale})`; }
+        function zoomView(delta) { viewScale = Math.max(0.4, Math.min(viewScale + delta, 2.5)); updateTransform(); }
+        function resetViewPort() { panContainer.classList.add('smooth'); autoFitView(); setTimeout(() => panContainer.classList.remove('smooth'), 300); }
+
+        stage.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.controls-panel') || e.target.closest('.zoom-controls') || e.target.closest('.slot')) return;
+            isPanning = true; panContainer.classList.remove('smooth'); startX = e.clientX - panX; startY = e.clientY - panY;
+        });
+        window.addEventListener('mousemove', (e) => { if (isPanning) { panX = e.clientX - startX; panY = e.clientY - startY; updateTransform(); } });
+        window.addEventListener('mouseup', () => { isPanning = false; });
+
+        stage.addEventListener('touchstart', (e) => {
+            if (isDraggingTool || e.target.closest('.controls-panel') || e.target.closest('.zoom-controls')) return;
+            panContainer.classList.remove('smooth');
+            if (e.touches.length === 1) { isPanning = true; startX = e.touches[0].clientX - panX; startY = e.touches[0].clientY - panY; }
+            else if (e.touches.length === 2) { isPanning = false; initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); initialScale = viewScale; }
+        }, {passive: false});
+
+        stage.addEventListener('touchmove', (e) => {
+            if (isDraggingTool || e.target.closest('.controls-panel') || e.target.closest('.zoom-controls')) return;
+            e.preventDefault();
+            if (isPanning && e.touches.length === 1) { panX = e.touches[0].clientX - startX; panY = e.touches[0].clientY - startY; updateTransform(); }
+            else if (e.touches.length === 2 && initialPinchDist) {
+                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                viewScale = Math.max(0.4, Math.min(initialScale * (dist / initialPinchDist), 2.5)); updateTransform();
+            }
+        }, {passive: false});
+        stage.addEventListener('touchend', () => { isPanning = false; initialPinchDist = null; });
+
+        let draggedTool = null, touchClone = null;
+        function handleDragStart(e) { if(e.currentTarget.classList.contains('disabled')) return; draggedTool = e.currentTarget.dataset.tool; e.dataTransfer.setData('text/plain', draggedTool); }
+        stage.addEventListener('dragover', (e) => e.preventDefault());
+        stage.addEventListener('drop', (e) => { e.preventDefault(); checkAndPlace(e.dataTransfer.getData('text/plain')); });
+
+        function handleTouchStart(e) {
+            if (e.currentTarget.classList.contains('disabled')) return;
+            isDraggingTool = true; draggedTool = e.currentTarget.dataset.tool;
+            touchClone = e.currentTarget.cloneNode(true);
+            touchClone.style.position = 'fixed'; touchClone.style.zIndex = '9999'; touchClone.style.opacity = '0.8'; touchClone.style.pointerEvents = 'none'; touchClone.style.width = e.currentTarget.offsetWidth + 'px';
+            touchClone.classList.remove('tool-item'); touchClone.style.background = '#ebf5fb'; touchClone.style.border = '2px dashed #3498db';
+            document.body.appendChild(touchClone); updateClonePosition(e.touches[0]);
+        }
+        function handleTouchMove(e) { if (touchClone) { e.preventDefault(); updateClonePosition(e.touches[0]); } }
+        function updateClonePosition(touch) { if (!touchClone) return; touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px'; touchClone.style.top = (touch.clientY - touchClone.offsetHeight / 2) + 'px'; }
+        function handleTouchEnd(e) {
+            if (touchClone) {
+                touchClone.remove(); touchClone = null;
+                const touch = e.changedTouches[0]; const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (dropTarget && (dropTarget.id === 'stage' || dropTarget.closest('#stage'))) checkAndPlace(draggedTool);
+                draggedTool = null; setTimeout(() => { isDraggingTool = false; }, 50);
+            }
+        }
+
+        function checkAndPlace(toolType) {
+            if (!toolType) return;
+            if (currentStep < 7) {
+                if (toolType === stepTools[currentStep]) {
+                    document.getElementById(`slot-${toolType}`).style.display = 'block';
+                    const card = document.getElementById(`tool-${toolType}`);
+                    if(card) { card.classList.add('disabled'); card.setAttribute('draggable', 'false'); }
+                    advanceStep();
+                } else alert('⚠️ 順序錯誤！請按照正確的實驗步驟放置器材。');
+            } else alert('⚠️ 器材已放置完畢，請進行後續的操作。');
+        }
+
+        function advanceStep() {
+            if (currentMode === 'review') {
+                document.getElementById(`step-${currentStep}`)?.classList.remove('active');
+                document.getElementById(`step-${currentStep}`)?.classList.add('completed');
+            }
+            currentStep++;
+            if (currentMode === 'review' && currentStep <= 12) {
+                const nextStep = document.getElementById(`step-${currentStep}`);
+                if (nextStep) { nextStep.classList.add('active'); nextStep.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            }
+            if (currentStep === 7) statusTag.innerText = "器材已齊備，開煤氣前請先【關閉氣孔】";
+        }
+
+        btnAir.addEventListener('click', () => {
+            if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
+            if (currentStep === 7) {
+                isAirOpen = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
+                document.getElementById('air-hole').setAttribute('fill', '#95a5a6');
+                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#2ecc71";
+                statusTag.innerText = "氣孔已關閉，請開啟煤氣"; advanceStep(); return;
+            }
+            if (currentStep === 8 || currentStep === 9) return alert("⚠️ 安全警告：開啟煤氣與點火前，氣孔必須保持關閉！");
+            if (currentStep === 10) {
+                isAirOpen = true; isNonLuminous = true; btnAir.innerText = "🌀 氣孔 (開)"; btnAir.classList.remove('active-on');
+                document.getElementById('air-hole').setAttribute('fill', '#000');
+                document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#e67e22";
+                updateFlameState(); advanceStep(); startMainLoop(); statusTag.innerText = "無光焰加熱中。實驗結束時請先【關閉氣孔】"; return;
+            }
+            if (currentStep === 11) {
+                isAirOpen = false; isNonLuminous = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
+                document.getElementById('air-hole').setAttribute('fill', '#95a5a6');
+                document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#2ecc71";
+                updateFlameState(); advanceStep(); statusTag.innerText = "已轉回有光焰，請【關閉煤氣】熄滅火焰"; return;
+            }
+            if (currentStep >= 12) alert("💡 本生燈已安全關閉。");
+        });
+
+        btnGas.addEventListener('click', () => {
+            if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
+            if (currentStep === 7) return alert("⚠️ 安全警告：開啟煤氣前，必須先關閉氣孔！");
+            if (currentStep === 8) {
+                isGasOpen = true; btnGas.innerText = "⛽ 煤氣 (開)"; btnGas.classList.add('active-on');
+                document.getElementById('gas-status').innerText = "開啟"; document.getElementById('gas-status').style.color = "#2ecc71";
+                statusTag.innerText = "煤氣已開啟，請點火"; advanceStep(); return;
+            }
+            if (currentStep === 9 || currentStep === 10) return alert("⚠️ 安全警告：熄滅本生燈前，必須先關閉氣孔轉為有光焰！");
+            if (currentStep === 11) return alert("⚠️ 安全警告：請先點擊「氣孔」將其關閉，再關閉煤氣！");
+            if (currentStep === 12) {
+                isGasOpen = false; isLit = false; isNonLuminous = false;
+                btnGas.innerText = "⛽ 煤氣 (關)"; btnGas.classList.remove('active-on');
+                document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#95a5a6";
+                updateFlameState(); advanceStep();
+                if (currentMode === 'exam') { statusTag.innerText = "🎉 考試完成！恭喜安全完成實驗！"; setTimeout(() => alert("🎉 恭喜你！成功按照正確步驟完成了本生燈加熱水實驗！"), 200); }
+                else statusTag.innerText = "🎉 本生燈已安全熄滅，實驗完成！";
+                return;
+            }
+            if (currentStep > 12) alert("💡 煤氣已關閉。");
+        });
+
+        btnLighter.addEventListener('click', () => {
+            if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
+            if (currentStep === 7) return alert("⚠️ 安全警告：點火前必須先關閉氣孔並開啟煤氣！");
+            if (currentStep === 8) return alert("⚠️ 操作錯誤：請先開啟煤氣，才能點火！");
+            if (currentStep === 9) {
+                isLit = true; updateFlameState(); statusTag.innerText = "已點燃有光焰！請開啟氣孔轉換為無光焰"; advanceStep(); return;
+            }
+            if (currentStep >= 10) alert("💡 本生燈已經點燃！");
+        });
+
+        function updateFlameState() {
+            const flameStatus = document.getElementById('flame-status'), flameGroup = document.getElementById('flame-group'), flameNonLuminous = document.getElementById('flame-nonluminous');
+            if (isLit) {
+                flameGroup.style.display = 'block';
+                if (isNonLuminous) { flameNonLuminous.style.display = 'block'; flameStatus.innerText = "無光焰 (加熱中)"; flameStatus.style.color = "#00d2ff"; }
+                else { flameNonLuminous.style.display = 'none'; flameStatus.innerText = "有光焰 (安全焰)"; flameStatus.style.color = "#f1c40f"; }
+            } else { flameGroup.style.display = 'none'; flameStatus.innerText = "未點燃"; flameStatus.style.color = "#95a5a6"; }
+        }
+
+        function startMainLoop() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(() => {
+                if (isLit && isNonLuminous) temperature += 0.8;
+                else if (!isLit) temperature -= 0.3;
+                temperature = Math.max(25.0, Math.min(100.0, temperature));
+                document.getElementById('temp-display').innerText = temperature.toFixed(1) + " °C";
+                document.getElementById('thermo-mercury').setAttribute('height', 25 + (temperature - 25) * 1.1);
+                document.getElementById('thermo-mercury').setAttribute('y', 175 - (25 + (temperature - 25) * 1.1));
+                document.getElementById('steam').style.display = (temperature > 70) ? 'block' : 'none';
+            }, 200);
+        }
+
+        function resetExperiment() {
+            clearInterval(timer); currentStep = 0; temperature = 25.0; isAirOpen = true; isGasOpen = false; isLit = false; isNonLuminous = false;
+            document.querySelectorAll('.slot').forEach(s => s.style.display = 'none');
+            document.getElementById('flame-group').style.display = 'none';
+            document.getElementById('flame-nonluminous').style.display = 'none';
+            document.getElementById('air-hole').setAttribute('fill', '#000');
+            document.getElementById('steam').style.display = 'none';
+            renderToolbox();
+            document.querySelectorAll('.step-card').forEach((c, idx) => { c.classList.remove('active', 'completed'); if (idx === 0) c.classList.add('active'); });
+            document.getElementById('temp-display').innerText = "25.0 °C";
+            document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#e67e22";
+            document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#95a5a6";
+            document.getElementById('flame-status').innerText = "未點燃"; document.getElementById('flame-status').style.color = "#95a5a6";
+            btnAir.classList.remove('active-on'); btnAir.innerText = "🌀 氣孔 (開)";
+            btnGas.classList.remove('active-on'); btnGas.innerText = "⛽ 煤氣 (關)";
+            document.getElementById('thermo-mercury').setAttribute('height', 25);
+            document.getElementById('thermo-mercury').setAttribute('y', 150);
+            document.querySelector('.guide-panel').scrollTop = 0;
+            statusTag.innerText = (currentMode === 'exam') ? "📝 考試模式進行中" : "請先依順序擺放器材";
+            resetViewPort();
+        }
+
+        btnReset.addEventListener('click', () => {
+            if (currentMode === 'exam' && currentStep > 0 && currentStep < 12) { if (!confirm('確定要放棄本次考試並重新開始嗎？')) return; }
+            resetExperiment();
+        });
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(()=>{}); } 
+            else { if (document.exitFullscreen) document.exitFullscreen(); }
+        }
+    </script>
+</body>
+</html>
+    </template>
+
+    <!-- 切換實驗模擬器的腳本 -->
+    <script>
+        const labFrame = document.getElementById('lab-frame');
+        const bunsenCode = document.getElementById('bunsen-code').innerHTML;
+
+        // 初始化預設載入本生燈實驗
+        window.addEventListener('DOMContentLoaded', () => {
+            loadBunsenLab();
+        });
+
+        function switchLab(type, btnElement) {
+            // 切換 Active 樣式
+            document.querySelectorAll('.exp-tab').forEach(tab => tab.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            if (type === 'bunsen') {
+                loadBunsenLab();
+            } else {
+                showPlaceholder(type);
+            }
+        }
+
+        function loadBunsenLab() {
+            labFrame.srcdoc = bunsenCode;
+        }
+
+        function showPlaceholder(type) {
+            const titleMap = {
+                'titration': '⚖️ 酸鹼滴定實驗',
+                'induction': '🧲 電磁感應實驗',
+                'optics': '🌈 光線折射與反射實驗'
+            };
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {
+                            margin: 0;
+                            height: 100vh;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            background: #0f172a;
+                            color: #f8fafc;
+                            font-family: sans-serif;
+                        }
+                        h2 { font-size: 1.8rem; margin-bottom: 10px; color: #38bdf8; }
+                        p { font-size: 1rem; color: #94a3b8; }
+                        .loader {
+                            border: 4px solid #1e293b;
+                            border-top: 4px solid #38bdf8;
+                            border-radius: 50%;
+                            width: 40px;
+                            height: 40px;
+                            animation: spin 1s linear infinite;
+                            margin-bottom: 20px;
+                        }
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                    </style>
+                </head>
+                <body>
+                    <div class="loader"></div>
+                    <h2>${titleMap[type] || '實驗'} 籌備中</h2>
+                    <p>該模擬器模組即將上線，請先選擇「本生燈加熱水」進行操作。</p>
+                </body>
+                </html>
+            `;
+            labFrame.srcdoc = htmlContent;
+        }
+    </script>
+</body>
+</html>
