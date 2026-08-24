@@ -294,7 +294,7 @@
         .btn.active-on { background: #10b981 !important; }
         .btn-reset { background: var(--danger-color); }
         
-        /* 動態火焰特效與微晃動畫 */
+        /* 動態火焰特效 */
         .flame-anim-luminous { animation: flickerLuminous 0.12s infinite alternate ease-in-out; transform-origin: center bottom; }
         .flame-anim-nonluminous { animation: flickerNonLuminous 0.08s infinite alternate ease-in-out; transform-origin: center bottom; }
         @keyframes flickerLuminous { 
@@ -378,8 +378,8 @@
         <div class="lab-stage" id="stage">
             <div class="controls-panel">
                 <button class="btn" id="btn-air">🌀 氣孔 (開)</button>
+                <button class="btn" id="btn-lighter">🔥 打火機點火</button>
                 <button class="btn" id="btn-gas">⛽ 煤氣 (關)</button>
-                <button class="btn" id="btn-lighter">🔥 點火</button>
                 <button class="btn btn-reset" id="btn-reset">🔄 重置</button>
             </div>
             <div class="zoom-controls">
@@ -404,11 +404,10 @@
                         </svg>
                     </div>
 
-                    <!-- 5. 本生燈（含擬真優化火焰） -->
+                    <!-- 5. 本生燈（含打火機預備火花與雙層火焰） -->
                     <div class="slot" id="slot-burner" style="bottom: 15px; left: 130px; width: 60px; height: 120px; display:none; z-index: 5;">
                         <svg width="60" height="120" viewBox="0 0 60 120">
                             <defs>
-                                <!-- 有光焰漸層 -->
                                 <linearGradient id="grad-lum-outer" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#fef08a" />
                                     <stop offset="45%" stop-color="#f97316" />
@@ -420,7 +419,6 @@
                                     <stop offset="100%" stop-color="#f97316" />
                                 </linearGradient>
 
-                                <!-- 無光焰漸層（雙層錐） -->
                                 <linearGradient id="grad-nonlum-outer" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9" />
                                     <stop offset="50%" stop-color="#0284c7" stop-opacity="0.75" />
@@ -433,15 +431,23 @@
                                 </linearGradient>
                             </defs>
 
+                            <!-- 打火機點火槍點火視覺（步驟8顯示） -->
+                            <g id="lighter-spark" style="display:none;">
+                                <path d="M48,32 L34,48" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                                <rect x="42" y="26" width="12" height="6" fill="#ef4444" rx="1" transform="rotate(-40 42 26)"/>
+                                <circle cx="30" cy="50" r="5" fill="#f59e0b" class="flame-anim-luminous"/>
+                            </g>
+
+                            <!-- 本生燈火焰 -->
                             <g id="flame-group" style="display:none;">
-                                <!-- 有光焰 (黃色/黃橙色) -->
+                                <!-- 有光焰 (黃橙色) -->
                                 <g id="flame-luminous" class="flame-anim-luminous">
                                     <path d="M30,-6 C12,18 8,32 30,58 C52,32 48,18 30,-6 Z" fill="url(#grad-lum-outer)"/>
                                     <path d="M30,10 C20,26 18,36 30,55 C42,36 40,26 30,10 Z" fill="url(#grad-lum-inner)"/>
                                     <ellipse cx="30" cy="55" rx="5" ry="3" fill="#38bdf8" opacity="0.8"/>
                                 </g>
 
-                                <!-- 無光焰 (雙錐淡藍高溫火焰) -->
+                                <!-- 無光焰 (雙錐淡藍色) -->
                                 <g id="flame-nonluminous" class="flame-anim-nonluminous" style="display:none;">
                                     <path d="M30,-8 C14,14 10,28 30,58 C50,28 46,14 30,-8 Z" fill="url(#grad-nonlum-outer)"/>
                                     <path d="M30,20 C22,33 20,43 30,56 C40,43 38,33 30,20 Z" fill="url(#grad-nonlum-inner)"/>
@@ -460,13 +466,11 @@
                         </svg>
                     </div>
 
-                    <!-- 2. 三腳架（已移除中間遮擋立柱，視線完全穿透） -->
+                    <!-- 2. 三腳架（無中央立柱遮擋） -->
                     <div class="slot" id="slot-tripod" style="bottom: 15px; left: 85px; width: 150px; height: 160px; display:none;">
                         <svg width="150" height="160" viewBox="0 0 150 160">
-                            <!-- 頂環 -->
                             <ellipse cx="75" cy="18" rx="55" ry="10" fill="#1e293b" stroke="#0f172a" stroke-width="3"/>
                             <ellipse cx="75" cy="18" rx="42" ry="6" fill="#0f172a"/>
-                            <!-- 兩側金屬腳腿（中央留空無遮擋） -->
                             <path d="M25,20 L10,158 M125,20 L140,158" stroke="#1e293b" stroke-width="9" stroke-linecap="round"/>
                             <path d="M25,20 L10,158 M125,20 L140,158" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
                         </svg>
@@ -534,11 +538,11 @@
                 <div class="step-card" id="step-4">5. 移入【本生燈】</div>
                 <div class="step-card" id="step-5">6. 放置【鐵架鐵夾】</div>
                 <div class="step-card" id="step-6">7. 夾好【溫度計】</div>
-                <div class="step-card" id="step-7">8. 關閉氣孔 (開煤氣前)</div>
-                <div class="step-card" id="step-8">9. 開啟煤氣</div>
-                <div class="step-card" id="step-9">10. 點火 (有光焰)</div>
+                <div class="step-card" id="step-7">8. 關閉氣孔 (開煤氣前預備)</div>
+                <div class="step-card" id="step-8">9. 點燃打火機 (在燈口準備)</div>
+                <div class="step-card" id="step-9">10. 開啟煤氣 (點燃有光焰)</div>
                 <div class="step-card" id="step-10">11. 開氣孔 (無光焰加熱)</div>
-                <div class="step-card" id="step-11">12. 關閉氣孔 (熄火前)</div>
+                <div class="step-card" id="step-11">12. 關氣孔 (轉回有光焰)</div>
                 <div class="step-card" id="step-12">13. 關閉煤氣 (熄滅火焰)</div>
             </div>
             <div class="exam-mask" id="exam-mask">🔒 <b>考試進行中</b><br><br>提示已收起。<br>請憑記憶正確放置器材並操作開關。</div>
@@ -634,7 +638,7 @@
         ];
 
         const stepTools = ['mat', 'tripod', 'gauze', 'beaker', 'burner', 'stand', 'thermometer'];
-        let currentMode = 'review', currentStep = 0, temperature = 25.0, isAirOpen = true, isGasOpen = false, isLit = false, isNonLuminous = false, timer = null;
+        let currentMode = 'review', currentStep = 0, temperature = 25.0, isAirOpen = true, isGasOpen = false, isLighterLit = false, isLit = false, isNonLuminous = false, timer = null;
         const stage = document.getElementById('stage'), panContainer = document.getElementById('pan-container'), btnAir = document.getElementById('btn-air'), btnGas = document.getElementById('btn-gas'), btnLighter = document.getElementById('btn-lighter'), btnReset = document.getElementById('btn-reset'), statusTag = document.getElementById('status-tag'), toolsContainer = document.getElementById('tools-container');
 
         function renderToolbox() {
@@ -653,7 +657,7 @@
 
         function switchMode(mode) {
             if (currentMode === mode) return;
-            if (currentMode === 'exam' && currentStep > 0 && currentStep < 12) { if (!confirm('切換模式將視為「放棄考試」，確定切換？')) return; }
+            if (currentMode === 'exam' && currentStep > 0 && currentStep < 13) { if (!confirm('切換模式將視為「放棄考試」，確定切換？')) return; }
             currentMode = mode;
             document.getElementById('btn-mode-review').classList.toggle('active', mode === 'review');
             document.getElementById('btn-mode-exam').classList.toggle('active', mode === 'exam');
@@ -742,67 +746,88 @@
                 document.getElementById(`step-${currentStep}`)?.classList.add('completed');
             }
             currentStep++;
-            if (currentMode === 'review' && currentStep <= 12) {
+            if (currentMode === 'review' && currentStep <= 13) {
                 const nextStep = document.getElementById(`step-${currentStep}`);
                 if (nextStep) { nextStep.classList.add('active'); nextStep.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
             }
-            if (currentStep === 7) statusTag.innerText = "器材已齊備，開煤氣前請先【關閉氣孔】";
+            if (currentStep === 7) statusTag.innerText = "器材已齊備，點火前請先【關閉氣孔】";
         }
 
+        // 1. 氣孔操作
         btnAir.addEventListener('click', () => {
             if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
+            
+            // 步驟 7：關閉氣孔
             if (currentStep === 7) {
                 isAirOpen = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
                 document.getElementById('air-hole').setAttribute('fill', '#94a3b8');
                 document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#10b981";
-                statusTag.innerText = "氣孔已關閉，請開啟煤氣"; advanceStep(); return;
+                statusTag.innerText = "氣孔已關閉，請先點燃打火機在燈口預備"; advanceStep(); return;
             }
-            if (currentStep === 8 || currentStep === 9) return alert("⚠️ 安全警告：開啟煤氣與點火前，氣孔必須保持關閉！");
+            if (currentStep === 8) return alert("⚠️ 操作提醒：請點擊「打火機點火」按鈕準備點火！");
+            if (currentStep === 9) return alert("⚠️ 操作提醒：打火機已在燈口預備，請點擊「煤氣」開啟氣源！");
+            
+            // 步驟 10：點燃後開啟氣孔（轉無光焰）
             if (currentStep === 10) {
                 isAirOpen = true; isNonLuminous = true; btnAir.innerText = "🌀 氣孔 (開)"; btnAir.classList.remove('active-on');
                 document.getElementById('air-hole').setAttribute('fill', '#0f172a');
                 document.getElementById('air-status').innerText = "開啟"; document.getElementById('air-status').style.color = "#f59e0b";
                 updateFlameState(); advanceStep(); startMainLoop(); statusTag.innerText = "無光焰加熱中。實驗結束時請先【關閉氣孔】"; return;
             }
+            
+            // 步驟 11：關閉氣孔（轉回有光焰）
             if (currentStep === 11) {
                 isAirOpen = false; isNonLuminous = false; btnAir.innerText = "🌀 氣孔 (關)"; btnAir.classList.add('active-on');
                 document.getElementById('air-hole').setAttribute('fill', '#94a3b8');
                 document.getElementById('air-status').innerText = "關閉"; document.getElementById('air-status').style.color = "#10b981";
-                updateFlameState(); advanceStep(); statusTag.innerText = "已轉回有光焰，請【關閉煤氣】熄滅火焰"; return;
+                updateFlameState(); advanceStep(); statusTag.innerText = "已轉回有光焰，請直接【關閉煤氣】熄滅火焰"; return;
             }
             if (currentStep >= 12) alert("💡 本生燈已安全關閉。");
         });
 
+        // 2. 打火機點火操作（先點打火機，再開煤氣）
+        btnLighter.addEventListener('click', () => {
+            if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
+            if (currentStep === 7) return alert("⚠️ 安全警告：點火前必須先關閉氣孔！");
+            
+            // 步驟 8：打火機在燈口預備點火
+            if (currentStep === 8) {
+                isLighterLit = true;
+                btnLighter.classList.add('active-on');
+                document.getElementById('lighter-spark').style.display = 'block';
+                statusTag.innerText = "打火機火花已在燈口預備！請【開啟煤氣】點燃本生燈"; advanceStep(); return;
+            }
+            if (currentStep >= 9) alert("💡 本生燈已順利點燃或打火機已使用！");
+        });
+
+        // 3. 煤氣開關操作
         btnGas.addEventListener('click', () => {
             if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
-            if (currentStep === 7) return alert("⚠️ 安全警告：開啟煤氣前，必須先關閉氣孔！");
-            if (currentStep === 8) {
-                isGasOpen = true; btnGas.innerText = "⛽ 煤氣 (開)"; btnGas.classList.add('active-on');
+            if (currentStep === 7) return alert("⚠️ 安全警告：開煤氣前請先關閉氣孔！");
+            if (currentStep === 8) return alert("⚠️ 安全警告：嚴禁先開煤氣！請先點燃打火機在燈口預備，以防煤氣積聚發生危險。");
+            
+            // 步驟 9：開啟煤氣並點燃有光焰
+            if (currentStep === 9) {
+                isGasOpen = true; isLit = true; isLighterLit = false;
+                btnGas.innerText = "⛽ 煤氣 (開)"; btnGas.classList.add('active-on');
+                btnLighter.classList.remove('active-on');
+                document.getElementById('lighter-spark').style.display = 'none';
                 document.getElementById('gas-status').innerText = "開啟"; document.getElementById('gas-status').style.color = "#10b981";
-                statusTag.innerText = "煤氣已開啟，請點火"; advanceStep(); return;
+                updateFlameState(); statusTag.innerText = "已點燃有光焰！請開啟氣孔轉換為無光焰加熱"; advanceStep(); return;
             }
-            if (currentStep === 9 || currentStep === 10) return alert("⚠️ 安全警告：熄滅本生燈前，必須先關閉氣孔轉為有光焰！");
-            if (currentStep === 11) return alert("⚠️ 安全警告：請先點擊「氣孔」將其關閉，再關閉煤氣！");
+            if (currentStep === 10) return alert("⚠️ 操作錯誤：無光焰加熱中，實驗結束請先【關閉氣孔】！");
+            
+            // 步驟 12：關氣孔後直接關閉煤氣熄火
             if (currentStep === 12) {
                 isGasOpen = false; isLit = false; isNonLuminous = false;
                 btnGas.innerText = "⛽ 煤氣 (關)"; btnGas.classList.remove('active-on');
                 document.getElementById('gas-status').innerText = "關閉"; document.getElementById('gas-status').style.color = "#94a3b8";
                 updateFlameState(); advanceStep();
-                if (currentMode === 'exam') { statusTag.innerText = "🎉 考試完成！恭喜安全完成實驗！"; setTimeout(() => alert("🎉 恭喜你！成功按照正確步驟完成了本生燈加熱水實驗！"), 200); }
-                else statusTag.innerText = "🎉 本生燈已安全熄滅，實驗完成！";
+                if (currentMode === 'exam') { statusTag.innerText = "🎉 考試完成！恭喜安全完成實驗！"; setTimeout(() => alert("🎉 恭喜你！成功按照正確步驟（打火機引火->開煤氣/關氣孔->關煤氣）完成了本生燈加熱水實驗！"), 200); }
+                else statusTag.innerText = "🎉 本生燈已安全熄滅，實驗完整結束！";
                 return;
             }
             if (currentStep > 12) alert("💡 煤氣已關閉。");
-        });
-
-        btnLighter.addEventListener('click', () => {
-            if (currentStep < 7) return alert("⚠️ 操作錯誤：請先依次序擺放好所有實驗器材！");
-            if (currentStep === 7) return alert("⚠️ 安全警告：點火前必須先關閉氣孔並開啟煤氣！");
-            if (currentStep === 8) return alert("⚠️ 操作錯誤：請先開啟煤氣，才能點火！");
-            if (currentStep === 9) {
-                isLit = true; updateFlameState(); statusTag.innerText = "已點燃有光焰！請開啟氣孔轉換為無光焰"; advanceStep(); return;
-            }
-            if (currentStep >= 10) alert("💡 本生燈已經點燃！");
         });
 
         function updateFlameState() {
@@ -828,10 +853,11 @@
         }
 
         function resetExperiment() {
-            clearInterval(timer); currentStep = 0; temperature = 25.0; isAirOpen = true; isGasOpen = false; isLit = false; isNonLuminous = false;
+            clearInterval(timer); currentStep = 0; temperature = 25.0; isAirOpen = true; isGasOpen = false; isLighterLit = false; isLit = false; isNonLuminous = false;
             document.querySelectorAll('.slot').forEach(s => s.style.display = 'none');
             document.getElementById('flame-group').style.display = 'none';
             document.getElementById('flame-nonluminous').style.display = 'none';
+            document.getElementById('lighter-spark').style.display = 'none';
             document.getElementById('air-hole').setAttribute('fill', '#0f172a');
             document.getElementById('steam').style.display = 'none';
             renderToolbox();
@@ -842,6 +868,7 @@
             document.getElementById('flame-status').innerText = "未點燃"; document.getElementById('flame-status').style.color = "#94a3b8";
             btnAir.classList.remove('active-on'); btnAir.innerText = "🌀 氣孔 (開)";
             btnGas.classList.remove('active-on'); btnGas.innerText = "⛽ 煤氣 (關)";
+            btnLighter.classList.remove('active-on');
             document.getElementById('thermo-mercury').setAttribute('height', 15);
             document.getElementById('thermo-mercury').setAttribute('y', 145);
             document.querySelector('.guide-panel').scrollTop = 0;
@@ -850,7 +877,7 @@
         }
 
         btnReset.addEventListener('click', () => {
-            if (currentMode === 'exam' && currentStep > 0 && currentStep < 12) { if (!confirm('確定要放棄本次考試並重新開始嗎？')) return; }
+            if (currentMode === 'exam' && currentStep > 0 && currentStep < 13) { if (!confirm('確定要放棄本次考試並重新開始嗎？')) return; }
             resetExperiment();
         });
 
